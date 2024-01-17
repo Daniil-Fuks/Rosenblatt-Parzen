@@ -65,23 +65,26 @@ y = [4.90697, 2.77843, -0.85755, -4.62554, 4.98347, -4.93088, -4.84314, -4.55974
 
 
 
-# c = 0
-# mistake = []
-# doter = []
-# c_lst = []
-# while c < 5:
-#     c += 0.001
-#     c_lst.append(c)
-#     x_dot = result(y, x, 2.5, c)
-#     mist = calc_mistake(y, x_dot)
-#     print(f'{c}: {mist}')
-#     mistake.append(mist)
-#     doter.append(x_dot)
+c = 0
+mistake = []
+doters = []
+c_lst = []
+while c < 5:
+    c += 0.001
+    x_dot = result(y, x, 2.5, c)
+    if x_dot not in doters:
+        mist = calc_mistake(y, x_dot)
+        print(f'{c}: {mist}')
+        mistake.append(mist)
+        doters.append(x_dot)
+        c_lst.append(c)
+print(doters)
+print(c_lst)
 # print(mistake.index(max(mistake)))
 # print(c_lst[mistake.index(max(mistake))])
 # print(result(y, x, 2.5, 0.415))
-# plt.scatter(c_lst, mistake)
-# plt.show()
+plt.plot(c_lst, mistake)
+plt.show()
 
 # res = result(y, 2.5, 6)
 # print(res)
