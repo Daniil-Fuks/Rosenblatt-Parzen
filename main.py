@@ -27,11 +27,32 @@ def off_doter(x_dot, xi_dot, c):
     else:
         return 0
 
-
 # Получаем предположительную точку
 # x - выбранная точка
-def result(lst_y, lst_x, x_dot, c):
+def result(lst_y, lst_x, x_dot, c, c2=1):
+    global where_f_bigger_zero
     # Если точка уже существует, функция ее выкидывает
+    up = 0
+    up2 = 0
+    down = 0
+    down2 = 0
+    for i in range(len(lst_y)):
+        xi_dot = lst_x[i]
+        if xi_dot != x_dot and off_doter(x_dot, xi_dot, c) > 0:
+            up += lst_y[i] * off_doter(x_dot, xi_dot, c) * off_doter(max(where_f_bigger_zero), y[i], c2)
+            down += off_doter(x_dot, xi_dot, c) * off_doter(max(where_f_bigger_zero), y[i], c2)
+            up2 += lst_y[i] * off_doter(x_dot, xi_dot, c) * off_doter(min(where_f_bigger_zero), y[i], c2)
+            down2 += off_doter(x_dot, xi_dot, c) * off_doter(min(where_f_bigger_zero), y[i], c2)
+        else:
+            up += lst_y[i] * off_doter(x_dot, xi_dot, c)
+            down += off_doter(x_dot, xi_dot, c)
+            
+    if down == 0:
+        return 0
+    return up / down
+
+
+def result_beta(lst_y, lst_x, x_dot, c):
     up = 0
     down = 0
     for i in range(len(lst_y)):
@@ -39,24 +60,20 @@ def result(lst_y, lst_x, x_dot, c):
         if xi_dot != x_dot:
             up += lst_y[i] * off_doter(x_dot, xi_dot, c)
             down += off_doter(x_dot, xi_dot, c)
-        else:
-            continue
     if down == 0:
         return 0
-    else:
-        return up / down
+    return up / down
 
-
-# def result(lst_y, lst_x, x_dot, c):
-#     # Если точка уже существует, функция ее выкидывает
+# def result_for_x(lst_y, lst_x, y_dot, c2):
 #     up = 0
 #     down = 0
-#     for i in range(len(lst_y)):
-#         xi_dot = lst_x[i]
-#         up += lst_y[i] * off_doter(x_dot, xi_dot, c)
-#         down += off_doter(x_dot, xi_dot, c)
+#     for i in range(len(lst_x)):
+#         yi_dot = lst_y[i]
+#         if yi_dot != y_dot:
+#             up += lst_x[i] * off_doter(y_dot, yi_dot, c2)
+#             down += off_doter(y_dot, yi_dot, c2)
 #     if down == 0:
-#         return 0
+#         return
 #     else:
 #         return up / down
 
@@ -92,32 +109,73 @@ y = [2.8791, -0.6158, -5.0619, -4.9169, 3.2302, -2.5018, -4.927, -1.982, 4.6586,
      0.6264, 3.1248, -4.9833, 4.5426, 7.3569, 2.3972, 4.8308, -0.3735, 5.9866, 3.3934, 5.6017, 2.3227, 5.9764, -3.2256,
      0.8924, -0.8589, -4.8207, 3.2701, -3.8122, 0.6057, 6.1021, -3.8536]
 
-c = 0
-mist_e = []
-c_lst = []
-mb_y = []
-c2 = 0
-c2_lst = []
-while c < 5:
-    c += 0.01
-    c_lst.append(c)
-    # Получение предположительных точек для каждого Х с одним параметром С.
-    for i in range(len(x)):
-        mb_y.append(result(y, x, x[i], c))
-    # Вычисление ошибки для каждой точки
 
-    e = calc_mistake(y, mb_y)
-    mist_e.append(e)
-    mb_y = []
-plt.plot(c_lst, mist_e)
-plt.xlabel('Настраиваемый параметр C')
-plt.ylabel('Ошибка (E)')
+mist_e = []
+
+mb_y = []
+mb_x = []
+
+c_lst = []
+c2_lst = []
+
+C = 0.17
+C2 = 5.001
+
+# Нахождение оптимального параметра C
+
+# c = 0
+# while c < 5:
+#     c += 0.01
+#     for i in range(len(x)):
+#         mb_y.append(result_beta(y, x, x[i], c))
+#     c_lst.append(c)
+#     # Получение предположительных точек для каждого Х с одним параметром С.
+#     # Вычисление ошибки для каждой точки
+#
+#     e = calc_mistake(y, mb_y)
+#     mist_e.append(e)
+#     mb_y = []
+# optimal_c = c_lst[mist_e.index(min(mist_e))]
+# print(optimal_c)
+
+
+# c2 = 0
+# mist_e_x = []
+# while c2 < 5:
+#     c2 += 0.01
+#     for i in range(len(y)):
+#         mb_x.append((result_beta(y, x, y[i], c2)))
+#     c2_lst.append(c2)
+#     e = calc_mistake(y, mb_x)
+#     mist_e_x.append(e)
+#     mb_x = []
+# optimal_c2 = c2_lst[mist_e_x.index(min(mist_e_x))]
+# print(optimal_c2)
+
+
+# Определение точек, при которых фи больше нуля
+where_f_bigger_zero = []
+for i in range(len(y)):
+    for j in range(len(y)):
+        x_dot = x[i]
+        xi_dot = x[j]
+        for yi in y:
+            if yi * off_doter(x_dot, xi_dot, C) > 0 and yi not in where_f_bigger_zero:
+                where_f_bigger_zero.append(yi)
+
+i = -8
+mb_y = []
+while i < 9:
+    print(result(y, x, x[i], C, C2))
+    print(x[i])
+    mb_y.append(result(y, x, x[i], C, C2))
+    mb_x.append(i)
+    i += 0.1
+
+plt.scatter(x, y)
+plt.plot(mb_x, mb_y, color='red')
+plt.xlabel('x')
+plt.ylabel('y')
 plt.show()
 
-# res = result(y, 2.5, 6)
-# print(res)
-
-# plt.scatter(x, y)
-# plt.axline(xy1=(1, res), xy2=(5, res))
-# plt.show()
-# print(res)
+# print(len(x2), len(y2))
