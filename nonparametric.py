@@ -129,7 +129,6 @@ for i in range(len(y)):
                 where_f_bigger_zero.append(yi)
 
 
-print(result(y, x, 3, C, C2))
 
 mb_x = []
 mb_y = []
@@ -147,6 +146,8 @@ while i < max(x):
 
 plt.scatter(x, y)
 plt.scatter(mb_x, mb_y, color='red')
+plt.xlabel('x')
+plt.ylabel('y')
 plt.show()
 
 # Вычисление оптимального С2
